@@ -1,0 +1,7 @@
+[bindings.kotlin]
+package_name = "dev.claas.meltcore"
+cdylib_name = "meltcore"
+
+[bindings.swift]
+cdylib_name = "meltcore_ffi"
+omit_argument_labels = true

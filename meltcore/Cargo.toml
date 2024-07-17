@@ -1,0 +1,12 @@
+[package]
+name = "meltcore"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+# cdylib for android. staticlib for iOS
+crate-type = ["lib","cdylib", "staticlib"]
+
+[dependencies]
+uniffi = "0.28.0"
+rusqlite = { version = "0.31.0", features = ["bundled-sqlcipher-vendored-openssl", "bundled", ] }

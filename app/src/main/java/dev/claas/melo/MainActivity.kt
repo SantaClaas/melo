@@ -23,17 +23,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.claas.melo.ui.theme.MeloTheme
+import dev.claas.meltcore.openDatabase
+import kotlinx.coroutines.launch
 
+//
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +57,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Onboarding(modifier: Modifier = Modifier) {
+fun Onboarding() {
 
     var name by remember {
         mutableStateOf("")
     }
+
+    val scope = rememberCoroutineScope()
+    val path = LocalContext.current.filesDir.path
+
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -72,7 +81,7 @@ fun Onboarding(modifier: Modifier = Modifier) {
         ) {
             Text(text = "Welcome", style = MaterialTheme.typography.displayLarge)
             Text(
-                "Enter a name you want others to recognize you with",
+                "Enter a name you want others to recognize you with $name",
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
             )
@@ -94,7 +103,12 @@ fun Onboarding(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
             )
             Button(
-                onClick = { /*TODO*/println("Continue") },
+                onClick = {
+                    scope.launch {
+                        val result = openDatabase(path)
+                        name = result
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Continue")
