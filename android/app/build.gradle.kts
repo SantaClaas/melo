@@ -87,18 +87,12 @@ dependencies {
 
 
 tasks.register<Exec>("cargoBuild") {
-    //    cargo ndk
-    //    --target aarch64-linux-android
-    //    --target armv7-linux-androideabi
-    //    --target i686-linux-android
-    //    --target x86_64-linux-android
-    //    --platform 26
-    //    --output-dir ./shared/generated/rust/jniLibs -- build
 
-    workingDir = File(project.projectDir.parent)
+    // Run in repository root
+    workingDir = project.projectDir.resolve("../..")
     val platform = android.ndkVersion.substringBefore('.')
     // Prevent stripping so we can generate the uniffi bindings with the included data
-    //TODO optimize later and strip?
+    //TODO optimize for release build and enable stripping to reduce size after we created bindings
     commandLine(
         "sh",
         "-c",
@@ -110,34 +104,20 @@ tasks.register<Exec>("generateUniFfiBindings") {
     workingDir = project.projectDir
     dependsOn("cargoBuild")
 
-    // We only need one variant like "arm64-v8a" to generate the Kotlin bindings code
-//    val libraryPath = "${layout.buildDirectory.asFile}/rustJniLibs/android/arm64-v8a/libmeltcore.so"
 
     // Since we are using the uniffi procedural macros in rust we can't use an .udl file to generate
     // the binding code and need to point to a library to read the metadata and generate the binding
-    // code. The target architecture in this case does not matter. There should be a better way than
-    // needing to know where the file is located for binding generation without .udl file
+    // code.
+    // The target architecture in this case does not matter we only need one.
+    // There should be a better way than needing to know where the file is located for binding
+    // generation without .udl file
     val libraryFile = File(librariesDirectory).resolve("arm64-v8a/libmeltcore.so").path
-
-    ///Users/claas/Developer/melo/app/build/rustJniLibs/android/arm64-v8a/libmeltcore.so
-        ///Users/claas/Developer/melo/app/build/rustJniLibs/android/arm64-v8a/libmeltcore.so
-//        layout.buildDirectory.file("rustJniLibs/android/arm64-v8a/libmeltcore.so").get().asFile.path
-//    val outDirectory = layout.buildDirectory.dir("generated/source/uniffi/java").get().asFile.path
-//    val outDirectory = layout.projectDirectory.dir("generated/java").asFile.path
 
     commandLine(
         "sh",
         "-c",
         "cargo run --package uniffi-bindgen generate --library $libraryFile --language kotlin --out-dir $bindingsOutDirectory"
     )
-
-//    sourceSets {
-//        named("main") {
-//            java.srcDirs(outDirectory)
-//        }
-//    }
-//        sourceSets["main"].java.srcDirs.add(File(outDirectory))
-
 }
 
 
