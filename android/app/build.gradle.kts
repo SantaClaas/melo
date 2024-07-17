@@ -1,8 +1,6 @@
-// Helped make sense of kotlin DSL for rust plugin with https://github.com/MarijnS95/AndroidVulkanInterop/blob/master/app/build.gradle.kts
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-//    id("org.mozilla.rust-android-gradle.rust-android")
 }
 
 // Clear these when rebuilding by putting them in the build directory
@@ -57,7 +55,6 @@ android {
     }
     ndkVersion = "26.3.11579264"
     sourceSets {
-//        main.java.srcDirs += "${layout.buildDirectory}/generated/source/uniffi/java"
         named("main") {
             java.srcDirs(bindingsOutDirectory)
             jniLibs.srcDirs(librariesDirectory)
@@ -66,8 +63,11 @@ android {
 }
 
 dependencies {
-//    implementation(libs.jna)
-    implementation("net.java.dev.jna:jna:5.13.0@aar")
+    implementation(libs.jna) {
+        artifact {
+            type = "aar"
+        }
+    }
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -104,7 +104,6 @@ tasks.register<Exec>("generateUniFfiBindings") {
     workingDir = project.projectDir
     dependsOn("cargoBuild")
 
-
     // Since we are using the uniffi procedural macros in rust we can't use an .udl file to generate
     // the binding code and need to point to a library to read the metadata and generate the binding
     // code.
@@ -120,24 +119,6 @@ tasks.register<Exec>("generateUniFfiBindings") {
     )
 }
 
-
-//tasks.whenTaskAdded {
-//    if (name == "mergeDebugJniLibFolders" || name == "mergeReleaseJniLibFolders" ) {
-//        dependsOn("cargoBuild")
-//    }
-//}
-
-//tasks.whenObjectAdded {
-//    if ((this.name == "mergeDebugJniLibFolders" || this.name == "mergeReleaseJniLibFolders")) {
-//        this.dependsOn("cargoBuild")
-//        // fix mergeDebugJniLibFolders  UP-TO-DATE
-//        this.inputs.dir(buildDir.resolve("rustJniLibs/android"))
-//    }
-//}
-//tasks.matching { it.name.matches(/merge.*JniLibFolders/) }.configureEach {
-//    it.inputs.dir(new File(buildDir, "rustJniLibs/android"))
-//    it.dependsOn("cargoBuild")
-//}
 
 tasks.whenTaskAdded {
     if (name == "javaPreCompileDebug" || name == "javaPreCompileRelease") {
