@@ -14,7 +14,7 @@ val librariesDirectory = layout.buildDirectory.dir("rustJniLibs").get().asFile.p
 android {
     namespace = "dev.claas.melo"
     compileSdk = 34
-    
+
     defaultConfig {
         applicationId = "dev.claas.melo"
         minSdk = 34
